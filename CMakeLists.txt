@@ -3,5 +3,6 @@ project(Pyro CXX)
 
 file(GLOB_RECURSE SRC "lib/*.cpp")
 include_directories(include)
+include_directories(rapidcsv/src)
 add_compile_options(-Wall -Wextra -g -fexceptions -std=c++17 -lpthread)
 add_library(Pyro Pyro.cpp ${SRC})
