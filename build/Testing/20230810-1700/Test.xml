@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="Linux-clang++"
+	BuildStamp="20230810-1700-Experimental"
+	Name="DESKTOP-NAHF2PV"
+	Generator="ctest-3.27.0"
+	CompilerName="/usr/bin/clang++"
+	CompilerVersion="15.0.0"
+	OSName="Linux"
+	Hostname="DESKTOP-NAHF2PV"
+	OSRelease="5.15.90.1-microsoft-standard-WSL2"
+	OSVersion="#1 SMP Fri Jan 27 02:56:13 UTC 2023"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="GenuineIntel"
+	VendorID="Intel Corporation"
+	FamilyID="6"
+	ModelID="183"
+	ProcessorCacheSize="36864"
+	NumberOfLogicalCPU="32"
+	NumberOfPhysicalCPU="16"
+	TotalVirtualMemory="8192"
+	TotalPhysicalMemory="32011"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="2995.2"
+	>
+	<Testing>
+		<StartDateTime>Aug 11 01:21 CST</StartDateTime>
+		<StartTestTime>1691688070</StartTestTime>
+		<TestList/>
+		<EndDateTime>Aug 11 01:21 CST</EndDateTime>
+		<EndTestTime>1691688070</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/vincent/Pyro/build",
+  "command": "/usr/bin/clang++ -I/home/vincent/Pyro/include -g -Wall -Wextra -g -fexceptions -std=c++17 -lpthread -o CMakeFiles/Pyro.dir/Pyro.cpp.o -c /home/vincent/Pyro/Pyro.cpp",
+  "file": "/home/vincent/Pyro/Pyro.cpp",
+  "output": "CMakeFiles/Pyro.dir/Pyro.cpp.o"
+},
+{
+  "directory": "/home/vincent/Pyro/build",
+  "command": "/usr/bin/clang++ -I/home/vincent/Pyro/include -g -Wall -Wextra -g -fexceptions -std=c++17 -lpthread -o CMakeFiles/Pyro.dir/lib/reader.cpp.o -c /home/vincent/Pyro/lib/reader.cpp",
+  "file": "/home/vincent/Pyro/lib/reader.cpp",
+  "output": "CMakeFiles/Pyro.dir/lib/reader.cpp.o"
+}
+]
