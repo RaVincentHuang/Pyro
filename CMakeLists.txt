@@ -3,6 +3,13 @@ project(Pyro CXX)
 
 file(GLOB_RECURSE SRC "lib/*.cpp")
 include_directories(include)
+
+# include rapidcsv
 include_directories(rapidcsv/src)
+
+# include boost
+find_package(boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
 add_compile_options(-Wall -Wextra -g -fexceptions -std=c++17 -lpthread)
 add_library(Pyro Pyro.cpp ${SRC})
