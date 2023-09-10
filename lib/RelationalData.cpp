@@ -1,22 +1,28 @@
 #include "RelationalData.h"
+#include "PLICache.h"
+#include "ColumnData.h"
 #include "rapidcsv.h"
+#include <cstddef>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
 
+using std::shared_ptr;
+
 RelationalData RelationalData::reader(std::string_view path) {
     rapidcsv::Document doc(path.data());
     auto names = doc.GetColumnNames();
     
-    std::vector<Attribute> schema;
+    Schema schema;
     for(auto attr : names) {
-        schema.push_back({attr, static_cast<ValueId>(schema.size())});
+        schema.columns.push_back(std::make_shared<Column>(schema, attr, static_cast<size_t>(schema.columns.size())));
     }
 
-    std::vector<Column> columns;
+    std::vector<ColumnData> columns;
 
-    for(ValueId i = 0; i < schema.size(); i++) {
+    for(size_t i = 0; i < schema.columns.size(); i++) {
         auto value = doc.GetColumn<std::string>(i);
         std::unordered_map<std::string, ValueId> check;
         std::vector<ValueId> data;
@@ -29,9 +35,14 @@ RelationalData RelationalData::reader(std::string_view path) {
                 data.push_back(len);
             }
         }
-        columns.push_back({schema.at(i), data});
+        auto pli = PLI(data);
+        columns.push_back({schema.columns.at(i), std::vector<ValueId>(pli.getProbTable()), pli});
     }
 
 
     return {schema, columns};
+}
+
+std::shared_ptr<Vertical> Schema::getVertical(const boost::dynamic_bitset<size_t>& bitset) const {
+
 }
