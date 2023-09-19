@@ -1,20 +1,20 @@
 #ifndef READER_H
 #define READER_H
 
+#include <cstddef>
 #include <string>
 #include <string_view>
 #include <vector>
 
-using usize = unsigned long;
 
 struct Attribute {
-    usize index;
+    size_t index;
     std::string_view name;
 };
 
 struct Column {
     Attribute& attribute;
-    std::vector<usize> data;
+    std::vector<size_t> data;
 };
 
 class RelationalData {

@@ -1,5 +1,6 @@
 #include "reader.h"
 #include "rapidcsv.h"
+#include <cstddef>
 #include <string_view>
 #include <tuple>
 #include <unordered_map>
@@ -9,15 +10,15 @@ RelationalData RelationalData::reader(std::string_view path) {
     rapidcsv::Document doc(path.data());
     auto tmp = doc.GetColumnNames();
     std::vector<Attribute> schema;
-    usize cnt = 0;
+    size_t cnt = 0;
     for(auto attri : tmp) {
         schema.push_back({cnt++, attri});
     }
     std::vector<Column> columns;
     for(auto i = 0UL; i < schema.size(); i++) {
         auto column = doc.GetColumn<std::string>(i);
-        std::vector<usize> data;
-        std::unordered_map<std::string, usize> check;
+        std::vector<size_t> data;
+        std::unordered_map<std::string, size_t> check;
         for(auto str : column) {
             if(check.count(str)) {
                 data.push_back(check.at(str));
