@@ -25,7 +25,7 @@ class Trie {
     Trie<ValueType>* getSubTrie(size_t index) {
         if(subTries.empty())
             return nullptr;
-        return this->subTries[index - offset].get();
+        return this->subTries[index - offset].getValue();
     }
 
     Trie<ValueType>* getOrCreateSubTrie(size_t index) {
@@ -36,7 +36,7 @@ class Trie {
         Trie<ValueType>* subTrie = getSubTrie(index);
         if(subTrie == nullptr) {
             subTries.at(index - offset) = std::make_unique<Trie<ValueType>>(index + 1, dimension);
-            subTrie = subTries.at(index - offset).get();
+            subTrie = subTries.at(index - offset).getValue();
         }
         return subTrie;
     }
@@ -86,7 +86,7 @@ public:
         return getOrCreateSubTrie(nextBit)->associate(key, nextBit + 1, value);
     }
 
-    ValueType get(const BitSet& key, size_t nextBit) {
+    ValueType getValue(const BitSet& key, size_t nextBit) {
         nextBit = key.find_next(nextBit);
         if(nextBit == BitSet::npos) {
             return value;
@@ -96,7 +96,7 @@ public:
         if(subTrie == nullptr)
             return nullptr;
 
-        return subTrie->get(key, nextBit + 1);
+        return subTrie->getValue(key, nextBit + 1);
     }
 
     ValueType remove(const BitSet& key, size_t nextBit) {

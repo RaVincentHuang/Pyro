@@ -4,6 +4,12 @@ project(Pyro CXX)
 file(GLOB_RECURSE SRC "lib/*.cpp")
 include_directories(include)
 
+find_package(boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
+add_compile_options(-Wall -Wextra -g -fexceptions -std=c++17)
+add_link_options(-lpthread)
+
 # include rapidcsv
 include_directories(rapidcsv/src)
 add_compile_options(-Ofast -Wall -Wextra -g -fexceptions -std=c++20 -lpthread)
