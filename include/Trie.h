@@ -179,12 +179,12 @@ public:
         return true;
     }
 
-    bool collectRestrictedSupersetKeys(BitSet& key, BitSet& blackList, size_t nextBit, BitSet& superKey, std::function<bool(BitSet&, ValueType)> collector) {
+    void collectRestrictedSupersetKeys(BitSet& key, BitSet& blackList, size_t nextBit, BitSet& superKey, std::function<void(BitSet&, ValueType)> collector) {
         nextBit = nextBit == BitSet::npos ? nextBit : key.find_next(nextBit);
 
         if(nextBit == BitSet::npos) {
-            if(value != nullptr && !collector(BitSet(superKey), value))
-                return false;
+            if(value != nullptr)
+                collector(BitSet(superKey), value);
 
             for(size_t i = offset; i < dimension; i++) {
                 if(blackList.test(i))
@@ -193,7 +193,6 @@ public:
                 if(subTrie != nullptr) {
                     superKey.set(i);
                     if(!subTrie->collectRestrictedSupersetKeys(key, blackList, nextBit, superKey, collector))
-                        return false;
                     superKey.reset(i);
                 }
             }
@@ -205,7 +204,6 @@ public:
                 if(subTrie != nullptr) {
                     superKey.set(i);
                     if(!subTrie->collectRestrictedSupersetKeys(key, blackList, nextBit, superKey, collector))
-                        return false;
                     superKey.reset(i);
                 }
             }
@@ -214,12 +212,9 @@ public:
             if(subTrie != nullptr) {
                 superKey.set(nextBit);
                 if(!subTrie->collectRestrictedSupersetKeys(key, blackList, nextBit + 1, superKey, collector))
-                    return false;
                 superKey.reset(nextBit);
             }
         }
-
-        return true;
     }
 
 };

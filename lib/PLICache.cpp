@@ -22,12 +22,6 @@ PLI::PLI(const std::vector<ValueId>& data) {
         }
     }
 
-    // delete cluster that has only one item. 
-    // positions.erase(std::remove_if(positions.begin(),  // FIXME bad must occur here
-    //     positions.end(), std::not_fn([](std::vector<ValueId> x) {
-    //         return x.size() > 1;
-    // })), positions.end());
-
     double keyGap = 0;
     nep = 0;
     size = 0;
