@@ -18,11 +18,11 @@ private:
     const Schema& schema;
     std::unique_ptr<Trie<ValueType>> trie;
     size_t _size = 0;
-
+ 
+public:
     explicit VerticalMap(const Schema& schema)
         : schema(schema) {}
-    
-public:
+        
     size_t size() { return _size; }
 
     bool empty() { return _size == 0; }

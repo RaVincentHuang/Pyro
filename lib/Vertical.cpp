@@ -52,7 +52,7 @@ shared_ptr<Vertical> Vertical::invert(shared_ptr<Vertical> scope) {
 }
 
 int Vertical::getArity() {
-    return this->getColumnIndices().size();
+    return this->getColumnIndices().count();
 }
 
 std::vector<shared_ptr<Column>> Vertical::getColumns() { 

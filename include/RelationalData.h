@@ -19,13 +19,13 @@ private:
         boost::dynamic_bitset<size_t> columnIndices;
         const Schema& schema;
     public:
-        EmptyVertical(const Schema& schema);
-        const boost::dynamic_bitset<size_t>& getColumnIndices();
-        const Schema& getSchema();
+        explicit EmptyVertical(const Schema& schema);
+        const boost::dynamic_bitset<size_t>& getColumnIndices() override;
+        const Schema& getSchema() override;
     };
 public:
     std::vector<std::shared_ptr<Column>> columns;
-    std::shared_ptr<Vertical> getVertical(const boost::dynamic_bitset<size_t>& bitset) const;
+    [[nodiscard]] std::shared_ptr<Vertical> getVertical(const boost::dynamic_bitset<size_t>& bitset) const;
 };
 
 struct ColumnData;

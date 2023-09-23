@@ -25,7 +25,7 @@ class Trie {
     Trie<ValueType>* getSubTrie(size_t index) {
         if(subTries.empty())
             return nullptr;
-        return this->subTries[index - offset].getValue();
+        return this->subTries[index - offset]->getValue();
     }
 
     Trie<ValueType>* getOrCreateSubTrie(size_t index) {
@@ -36,7 +36,7 @@ class Trie {
         Trie<ValueType>* subTrie = getSubTrie(index);
         if(subTrie == nullptr) {
             subTries.at(index - offset) = std::make_unique<Trie<ValueType>>(index + 1, dimension);
-            subTrie = subTries.at(index - offset).getValue();
+            subTrie = subTries.at(index - offset)->getValue();
         }
         return subTrie;
     }
@@ -70,7 +70,7 @@ class Trie {
     }
 
 public:
-    Trie(size_t dimension)
+    explicit Trie(size_t dimension)
         : offset(0), dimension(dimension) {}
     Trie(int offset, size_t dimension)
         : offset(offset), dimension(dimension) {}

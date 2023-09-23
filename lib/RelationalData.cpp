@@ -35,8 +35,8 @@ RelationalData RelationalData::reader(std::string_view path) {
                 data.push_back(len);
             }
         }
-        auto pli = PLI(data);
-        columns.push_back({schema.columns.at(i), std::vector<ValueId>(pli.getProbTable()), pli});
+        auto pli = std::make_shared<PLI>(data);
+        columns.push_back({schema.columns.at(i), std::vector<ValueId>(pli->getProbTable()), pli});
     }
 
 

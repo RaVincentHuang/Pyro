@@ -3,11 +3,12 @@
 
 #include "RelationalData.h"
 #include "PLICache.h"
+#include <memory>
 
 struct ColumnData {
     std::shared_ptr<Column> attribute;
     std::vector<ValueId> probingTable;
-    PLI pli;
+    std::shared_ptr<PLI> pli;
 };
 
 #endif

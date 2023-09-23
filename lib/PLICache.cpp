@@ -1,11 +1,16 @@
 #include "PLICache.h"
+#include "Common.h"
 #include "RelationalData.h"
 #include "ColumnData.h"
+#include "Trie.h"
+#include "Vertical.h"
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <unordered_map>
 #include <set>
 #include <vector>
+#include <random>
 
 PLI::PLI(const std::vector<ValueId>& data) {
     std::unordered_map<ValueId, std::vector<size_t>> positions;
@@ -119,6 +124,11 @@ PLI operator*(PLI& lhs, PLI& rhs) {
         newNep, newSize, lhs.relationalSize, lhs.relationalSize};
 }
 
+std::shared_ptr<PLI> PLI::intersect(std::shared_ptr<PLI> that) {
+    auto ans = (*this) * (*that);
+    return std::make_shared<PLI>(ans);
+}
+
 size_t PLI::getClusterSize(ValueId probingTableValueId) {
     switch (probingTableValueId) {
         case singletonValueId:
@@ -129,7 +139,7 @@ size_t PLI::getClusterSize(ValueId probingTableValueId) {
     }
 }
 
-PLI PLI::probAll(std::shared_ptr<Vertical> probingColumns, 
+std::shared_ptr<PLI> PLI::probAll(std::shared_ptr<Vertical> probingColumns, 
         const RelationalData& relationalData) {
     
     std::vector<std::set<size_t>> newClusters;
@@ -177,8 +187,9 @@ PLI PLI::probAll(std::shared_ptr<Vertical> probingColumns,
         return (*x.begin()) < (*y.begin());
     });
 
-    return {newClusters, {}, newEntropy, 
-        newNep, newSize, this->relationalSize, this->relationalSize};
+    return std::make_shared<PLI>(newClusters, std::vector<ValueId>({}), newEntropy, 
+        newNep, newSize, this->relationalSize, this->relationalSize);
+
 }
 
 bool PLI::takeProbe(size_t position, const RelationalData& relationalData, 
@@ -210,3 +221,111 @@ double PLI::calculateStripped(boost::dynamic_bitset<size_t> indices,
     }
     return accu;
 }
+
+PLICache::PLICache(RelationalData& relationData)
+    :  relationalData(relationData), index(VerticalMap<std::shared_ptr<PLI>>(relationData.schema)) {
+    for(const auto& column : relationData.schema.columns) {
+        auto pli = relationData.columns.at(column->index).pli;
+        index.put(column, pli);
+    }
+}   
+
+std::shared_ptr<PLI> PLICache::get(const std::shared_ptr<Vertical>& vertical) {
+    return index.get(vertical);
+}
+
+std::shared_ptr<PLI> PLICache::getOrCreateFor(const std::shared_ptr<Vertical>& vertical) {
+    auto pli = get(vertical);
+    if(pli != nullptr)
+        return pli;
+
+    auto subTuples = index.getSubsetTuples(vertical);
+
+    std::list<PLIRank> ranks;
+
+    for(auto [subVertical, subPLI] : subTuples) {
+        PLIRank pliRank = {subVertical, subPLI, subVertical->getArity()};
+        ranks.push_back(pliRank);
+    }
+
+    auto& smallestPliRank = *ranks.begin();
+    for(auto& rank : ranks) {
+        if(smallestPliRank.pli->getSize() > rank.pli->getSize() ||
+            (smallestPliRank.pli->getSize() == rank.pli->getSize() && smallestPliRank.addedArity < rank.addedArity))
+            smallestPliRank = rank;
+    }
+
+    std::vector<PLIRank> operands;
+    auto cover = BitSet(relationalData.schema.columns.size());
+    auto coverTester = BitSet(relationalData.schema.columns.size());
+    
+    // FIXME  if (smallestPliRank != null)
+    operands.push_back(smallestPliRank);
+    cover = cover | smallestPliRank.vertical->getColumnIndices();
+
+    while (cover.count() < vertical->getArity() && !ranks.empty()) {
+        auto& bestRank = *ranks.begin();
+        for(auto iter = ranks.begin(); iter != ranks.end();) {
+            auto& rank = *iter;
+            coverTester.clear();
+            coverTester = coverTester | rank.vertical->getColumnIndices();
+            coverTester = coverTester - cover;
+            rank.addedArity = coverTester.count();
+            if(rank.addedArity < 2) {
+                iter = ranks.erase(iter);
+                continue;
+            }
+
+            if(bestRank.addedArity < rank.addedArity 
+                || (bestRank.addedArity == rank.addedArity && bestRank.pli->getSize() > rank.pli->getSize())) {
+                bestRank = rank;        
+            }
+
+            ++iter;
+        }
+
+        operands.push_back(bestRank);
+        cover = cover | bestRank.vertical->getColumnIndices();
+    }
+
+    for(const auto& column : vertical->getColumns()) {
+        if(!cover.test(column->index)) {
+            auto columnData = relationalData.columns.at(column->index);
+            operands.emplace_back(column, columnData.pli, 1);
+        }
+    }
+
+    std::sort(operands.begin(), operands.end(), [](const PLIRank& x, const PLIRank& y) -> bool {
+        return x.pli->getSize() < y.pli->getSize();
+    });
+
+    std::random_device rd;
+    std::mt19937_64 engine(rd());
+    std::uniform_real_distribution<double> distrib(0.0, 1.0);
+
+    if(operands.size() >= naryIntersectionSize) {
+        auto basePliRank = operands.at(0);
+        pli = basePliRank.pli->probAll(vertical->without(basePliRank.vertical), relationalData);
+        if(distrib(engine) < cachingProbability) {
+            index.put(vertical, pli);
+        }
+    } else {
+        std::shared_ptr<Vertical> currentVertical = nullptr;
+        for(auto operand : operands) {
+            if(pli == nullptr) {
+                currentVertical = operand.vertical;
+                pli = operand.pli;
+            } else {
+                currentVertical = currentVertical->combine(operand.vertical);
+                pli = pli->intersect(operand.pli);
+                if(distrib(engine) < cachingProbability) {
+                    index.put(vertical, pli);
+                }
+            }
+        }
+    }
+
+    return pli;
+}
+
+ 
