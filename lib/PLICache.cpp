@@ -311,7 +311,7 @@ std::shared_ptr<PLI> PLICache::getOrCreateFor(const std::shared_ptr<Vertical>& v
         }
     } else {
         std::shared_ptr<Vertical> currentVertical = nullptr;
-        for(auto operand : operands) {
+        for(const auto& operand : operands) {
             if(pli == nullptr) {
                 currentVertical = operand.vertical;
                 pli = operand.pli;

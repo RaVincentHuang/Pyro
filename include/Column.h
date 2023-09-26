@@ -2,6 +2,7 @@
 #define COLUMN_H
 #include "Vertical.h"
 #include <cstddef>
+#include <string>
 
 struct Schema;
 
@@ -15,7 +16,9 @@ public:
         : schema(schema), name(name), index(index) {}
     const boost::dynamic_bitset<size_t>& getColumnIndices() override;
     const Schema& getSchema() override;
-
+    std::string toString() override {
+        return name.data();
+    }
 };
 
 #endif

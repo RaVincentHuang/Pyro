@@ -3,6 +3,7 @@
 #include <boost/dynamic_bitset.hpp>
 #include <cstddef>
 #include <memory>
+#include <string>
 #include <vector>
 
 using std::shared_ptr;
@@ -25,6 +26,7 @@ public:
     virtual std::vector<shared_ptr<Column>> getColumns();
     virtual shared_ptr<Vertical> getColumn(size_t n);
     virtual std::vector<shared_ptr<Vertical>> getParents();
+    virtual std::string toString() = 0;
 };
 
 #endif

@@ -25,7 +25,7 @@ private:
     };
 public:
     std::vector<std::shared_ptr<Column>> columns;
-    [[nodiscard]] std::shared_ptr<Vertical> getVertical(const boost::dynamic_bitset<size_t>& bitset) const;
+    std::shared_ptr<Vertical> getVertical(const boost::dynamic_bitset<size_t>& bitset) const;
 };
 
 struct ColumnData;

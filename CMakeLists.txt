@@ -7,7 +7,6 @@ include_directories(include)
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
-add_compile_options(-Wall -Wextra -g -fexceptions -std=c++17)
 add_link_options(-lpthread)
 
 # include rapidcsv
